@@ -8,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,8 +31,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,7 +54,7 @@ class MainActivity : ComponentActivity() {
     val keyboardLayoutLandscape = listOf(
         listOf("√", "sin", "asin", "ln", "|x|"),
         listOf("x²", "cos", "acos", "log", "³√"),
-        listOf("xʸ", "tan", "atan", "1/x", "rand"),
+        listOf("xʸ", "tan", "atan", "1/x", "π"),
         listOf("%", "x", "e", "x!", "EXP")
     )
 
@@ -86,7 +88,7 @@ class MainActivity : ComponentActivity() {
                             val parsedKey = when (key) {
                                 "x²" -> "^2"
                                 "xʸ" -> "^"
-                                "1/x" -> "^-1"
+                                "1/x" -> "^(-1)"
                                 "|x|" -> "abs"
                                 "EXP" -> "E"
                                 "x!" -> "!"
@@ -100,7 +102,7 @@ class MainActivity : ComponentActivity() {
                             } else {
                                 Toast.makeText(
                                     applicationContext,
-                                    "Osiągnięto maksymalną długość równania",
+                                    R.string.limit_communicat,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -114,13 +116,13 @@ class MainActivity : ComponentActivity() {
                     {
                         Column(Modifier.fillMaxSize().padding(innerPadding))
                         {
-                            Screen(modifier = Modifier.fillMaxWidth().weight(1f), formula = formula)
-                            Row (modifier = Modifier.fillMaxWidth().weight(2.5f))
+                            Screen(modifier = Modifier.fillMaxWidth().weight(1.2f), formula = formula)
+                            Row (modifier = Modifier.fillMaxWidth().weight(2f))
                             {
                                 Keyboard(
                                     layout = keyboardLayoutLandscape,
                                     modifier = Modifier.fillMaxWidth().weight(1f),
-                                    onKeyClick = handleKeyClick // Zawsze wywołuje wspólną logikę
+                                    onKeyClick = handleKeyClick
                                 )
                                 Keyboard(
                                     layout = keyboardLayoutPortrait,
@@ -151,30 +153,53 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Screen(modifier : Modifier = Modifier, formula : String)
 {
+    val density = LocalDensity.current
+
     Column(modifier)
     {
-        Box(Modifier.fillMaxSize().weight(3f).background(MaterialTheme.colorScheme.background).padding(16.dp), contentAlignment = Alignment.CenterEnd)
+        BoxWithConstraints(Modifier.fillMaxWidth()
+                .weight(3f)
+                .background(MaterialTheme.colorScheme.background)
+                .clip(RectangleShape)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.BottomEnd)
         {
+            val availableHeightSp = with(density) { (maxHeight - 16.dp).toSp().value }
+            val heightBasedSize = availableHeightSp / 4.5f
+            val safeLength = maxOf(formula.length, 20)
+            val widthBasedSize = (maxWidth.value * 4f) / (safeLength * 0.6f)
+            val dynamicFontSize = minOf(heightBasedSize, widthBasedSize).coerceIn(28f, 48f)
+            val dynamicLineHeight = (dynamicFontSize * 1.2f).sp
+
             Text(
                 text=formula,
                 color=contentColorFor(MaterialTheme.colorScheme.onBackground),
-                fontSize = 28.sp,
+                fontSize = dynamicFontSize.sp,
+                lineHeight = dynamicLineHeight,
                 textAlign = TextAlign.End,
-                maxLines = 5
+                maxLines = 4
             )
         }
+
         HorizontalDivider(
             Modifier.fillMaxWidth(0.98f)
                 .align(Alignment.CenterHorizontally),
             thickness = 1.dp,
-            color = Color(0xFF5B5B5B)
+            color = MaterialTheme.colorScheme.secondary
         )
-        Box(Modifier.fillMaxSize().weight(1f).background(MaterialTheme.colorScheme.background).padding(16.dp), contentAlignment = Alignment.CenterEnd)
+
+        BoxWithConstraints(Modifier.fillMaxSize()
+                .weight(1f)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterEnd)
         {
+            val dynamicFontSize = (minOf(maxHeight.value * 0.5f, 36f)).sp
+
             Text(
                 text="0",
                 color=contentColorFor(MaterialTheme.colorScheme.onBackground),
-                fontSize = 28.sp,
+                fontSize = dynamicFontSize,
                 textAlign = TextAlign.End
             )
         }
