@@ -40,7 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kalkulator.ui.theme.KalkulatorTheme
-import com.example.kalkulator.ui.theme.rajdhaniMediumFont
+import com.example.kalkulator.ui.theme.mainFont
 
 class MainActivity : ComponentActivity() {
 
@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        "=" -> { TODO() }
+                        "=" -> {  }
 
                         else -> {
                             val parsedKey = when (key) {
@@ -166,10 +166,10 @@ fun Screen(modifier : Modifier = Modifier, formula : String)
         {
             val availableHeightSp = with(density) { (maxHeight - 16.dp).toSp().value }
             val heightBasedSize = availableHeightSp / 4.5f
-            val safeLength = maxOf(formula.length, 20)
+            val safeLength = maxOf(formula.length, 10)
             val widthBasedSize = (maxWidth.value * 4f) / (safeLength * 0.6f)
             val dynamicFontSize = minOf(heightBasedSize, widthBasedSize).coerceIn(28f, 48f)
-            val dynamicLineHeight = (dynamicFontSize * 1.2f).sp
+            val dynamicLineHeight = (dynamicFontSize * 0.9f).sp
 
             Text(
                 text=formula,
@@ -177,7 +177,7 @@ fun Screen(modifier : Modifier = Modifier, formula : String)
                 fontSize = dynamicFontSize.sp,
                 lineHeight = dynamicLineHeight,
                 textAlign = TextAlign.End,
-                maxLines = 4
+                maxLines = 5
             )
         }
 
@@ -265,14 +265,14 @@ fun Key(
                 Text(
                     text = "⌫",
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontFamily = rajdhaniMediumFont,
+                    fontFamily = mainFont,
                     fontSize = dynamicFontSize
                 )
             } else {
                 Text(
                     text = text,
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontFamily = rajdhaniMediumFont,
+                    fontFamily = mainFont,
                     fontSize = dynamicFontSize
                 )
             }

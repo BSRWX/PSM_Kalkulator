@@ -8,14 +8,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.kalkulator.R
 
-val rajdhaniMediumFont = FontFamily(
-    Font(R.font.rajdhani_medium)
+val mainFont = FontFamily(
+    Font(R.font.jetbrainsmono_regular)
 )
 
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = rajdhaniMediumFont,
+        fontFamily = mainFont,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
