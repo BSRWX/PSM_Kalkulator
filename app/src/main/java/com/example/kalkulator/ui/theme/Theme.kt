@@ -18,7 +18,8 @@ private val DarkColorScheme = darkColorScheme(
     primary = DarkEqualsButton,
     onBackground = DarkTextGeneral,
     onSurface = DarkTextGeneral,
-    secondary = DarkSeparatorColor
+    secondary = DarkOperatorsColor,
+
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -28,7 +29,7 @@ private val LightColorScheme = lightColorScheme(
     primary = LightEqualsButton,
     onBackground = LightTextGeneral,
     onSurface = LightTextGeneral,
-    secondary = LightSeparatorColor
+    secondary = LightOperatorsColor
 )
 
 @Composable

@@ -42,16 +42,16 @@ import androidx.compose.ui.unit.sp
 import com.example.kalkulator.ui.theme.KalkulatorTheme
 import com.example.kalkulator.ui.theme.mainFont
 
-class MainActivity : ComponentActivity() {
-
-    val keyboardLayoutPortrait = listOf(
+class MainActivity : ComponentActivity()
+{
+    val standardKeyboard = listOf(
         listOf("C", "7", "4", "1", "0"),
         listOf("(", "8", "5", "2", "."),
         listOf(")", "9", "6", "3", "<<"),
         listOf("÷", "x", "-", "+", "=")
     )
 
-    val keyboardLayoutLandscape = listOf(
+    val scientificKeyboard = listOf(
         listOf("√", "sin", "asin", "ln", "|x|"),
         listOf("x²", "cos", "acos", "log", "³√"),
         listOf("xʸ", "tan", "atan", "1/x", "π"),
@@ -71,11 +71,13 @@ class MainActivity : ComponentActivity() {
                     val functionsWithParens = listOf("sin", "cos", "tan", "asin", "acos", "atan", "ln", "log", "√", "³√", "abs")
                     val tokensToDrop = listOf("asin(", "acos(", "atan(", "sin(", "cos(", "tan(", "log(", "EXP(", "ln(", "³√(", "√(", "abs(", "^2", "^-1")
 
-                    when (key) {
+                    when (key)
+                    {
                         "C" -> formula = ""
 
                         "<<" -> {
-                            if (formula.isNotEmpty()) {
+                            if (formula.isNotEmpty())
+                            {
                                 val token = tokensToDrop.find { formula.endsWith(it) }
                                 if (token != null) formula = formula.dropLast(token.length)
                                 else formula = formula.dropLast(1)
@@ -85,7 +87,8 @@ class MainActivity : ComponentActivity() {
                         "=" -> {  }
 
                         else -> {
-                            val parsedKey = when (key) {
+                            val parsedKey = when (key)
+                            {
                                 "x²" -> "^2"
                                 "xʸ" -> "^"
                                 "1/x" -> "^(-1)"
@@ -97,9 +100,12 @@ class MainActivity : ComponentActivity() {
 
                             val textToAdd = if (parsedKey in functionsWithParens) "$parsedKey(" else parsedKey
 
-                            if (formula.length + textToAdd.length <= 110) {
+                            if (formula.length + textToAdd.length <= 110)
+                            {
                                 formula += textToAdd
-                            } else {
+                            }
+                            else
+                            {
                                 Toast.makeText(
                                     applicationContext,
                                     R.string.limit_communicat,
@@ -120,12 +126,13 @@ class MainActivity : ComponentActivity() {
                             Row (modifier = Modifier.fillMaxWidth().weight(2f))
                             {
                                 Keyboard(
-                                    layout = keyboardLayoutLandscape,
+                                    layout = scientificKeyboard,
                                     modifier = Modifier.fillMaxWidth().weight(1f),
                                     onKeyClick = handleKeyClick
                                 )
+
                                 Keyboard(
-                                    layout = keyboardLayoutPortrait,
+                                    layout = standardKeyboard,
                                     modifier = Modifier.fillMaxWidth().weight(1f),
                                     onKeyClick = handleKeyClick
                                 )
@@ -138,7 +145,7 @@ class MainActivity : ComponentActivity() {
                         {
                             Screen(modifier = Modifier.fillMaxWidth().weight(2f), formula = formula)
                             Keyboard(
-                                layout = keyboardLayoutPortrait,
+                                layout = standardKeyboard,
                                 modifier = Modifier.fillMaxWidth().weight(3f),
                                 onKeyClick = handleKeyClick
                             )
@@ -209,18 +216,22 @@ fun Screen(modifier : Modifier = Modifier, formula : String)
 @Composable
 fun Keyboard(modifier : Modifier = Modifier,
              onKeyClick : (String) -> Unit,
-            layout : List<List<String>>)
+             layout : List<List<String>>
+)
 {
     Row(modifier.fillMaxSize().padding(16.dp), Arrangement.spacedBy(8.dp))
     {
-        for (col in layout) {
+        for (col in layout)
+        {
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                for (key in col) {
+            )
+            {
+                for (key in col)
+                {
                     Key(
                         text = key,
                         onClick = { onKeyClick(key) },
@@ -228,7 +239,7 @@ fun Keyboard(modifier : Modifier = Modifier,
                         color = when (key)
                         {
                             "C", "<<" -> MaterialTheme.colorScheme.secondaryContainer
-                            "(", ")", "+", "-", "x", "÷" -> MaterialTheme.colorScheme.surfaceVariant
+                            "(", ")", "+", "-", "x", "÷" -> MaterialTheme.colorScheme.secondary
                             "=" -> MaterialTheme.colorScheme.primary
                             else -> MaterialTheme.colorScheme.surfaceVariant
                         }
@@ -245,7 +256,8 @@ fun Key(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     color: Color
-) {
+)
+{
     BoxWithConstraints(modifier = modifier)
     {
         val dynamicFontSize = (minOf(maxWidth.value, maxHeight.value) * 0.4f).sp
@@ -268,7 +280,9 @@ fun Key(
                     fontFamily = mainFont,
                     fontSize = dynamicFontSize
                 )
-            } else {
+            }
+            else
+            {
                 Text(
                     text = text,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -278,5 +292,4 @@ fun Key(
             }
         }
     }
-
 }
