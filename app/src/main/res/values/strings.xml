@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Calculator</string>
     <string name="limit_communicat">Symbols limit reached</string>
+    <string name="calculation_error">Calculation error</string>
 </resources>

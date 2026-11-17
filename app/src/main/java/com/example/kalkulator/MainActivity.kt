@@ -23,10 +23,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,25 +56,37 @@ class MainActivity : ComponentActivity()
         listOf("√", "sin", "asin", "ln", "|x|"),
         listOf("x²", "cos", "acos", "log", "³√"),
         listOf("xʸ", "tan", "atan", "1/x", "π"),
-        listOf("%", "x", "e", "x!", "EXP")
+        listOf("%", "rand", "e", "x!", "EXP")
     )
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        for (key in outState.keySet()) {
+            android.util.Log.d("BUNDLE_DEBUG", "Klucz: $key -> ${outState.get(key)}")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             KalkulatorTheme {
+                val engine = remember { CalculatorEngine() }
                 var formula by rememberSaveable { mutableStateOf("") }
+                var result by rememberSaveable { mutableStateOf("") }
                 val configuration = LocalConfiguration.current
                 val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
                 val handleKeyClick: (String) -> Unit = { key ->
                     val functionsWithParens = listOf("sin", "cos", "tan", "asin", "acos", "atan", "ln", "log", "√", "³√", "abs")
-                    val tokensToDrop = listOf("asin(", "acos(", "atan(", "sin(", "cos(", "tan(", "log(", "EXP(", "ln(", "³√(", "√(", "abs(", "^2", "^-1")
+                    val tokensToDrop = listOf("asin(", "acos(", "atan(", "sin(", "cos(", "tan(", "log(", "E", "ln(", "³√(", "√(", "abs(", "^2", "^(-1)")
 
                     when (key)
                     {
-                        "C" -> formula = ""
+                        "C" -> {
+                            formula = ""
+                            result = ""
+                        }
 
                         "<<" -> {
                             if (formula.isNotEmpty())
@@ -84,7 +97,7 @@ class MainActivity : ComponentActivity()
                             }
                         }
 
-                        "=" -> {  }
+                        "=" -> { result = engine.Evaluate(formula) }
 
                         else -> {
                             val parsedKey = when (key)
@@ -122,7 +135,7 @@ class MainActivity : ComponentActivity()
                     {
                         Column(Modifier.fillMaxSize().padding(innerPadding))
                         {
-                            Screen(modifier = Modifier.fillMaxWidth().weight(1.2f), formula = formula)
+                            Screen(modifier = Modifier.fillMaxWidth().weight(1.2f), formula = formula, result = result)
                             Row (modifier = Modifier.fillMaxWidth().weight(2f))
                             {
                                 Keyboard(
@@ -143,7 +156,7 @@ class MainActivity : ComponentActivity()
                     {
                         Column(Modifier.fillMaxSize().padding(innerPadding))
                         {
-                            Screen(modifier = Modifier.fillMaxWidth().weight(2f), formula = formula)
+                            Screen(modifier = Modifier.fillMaxWidth().weight(2f), formula = formula, result = result)
                             Keyboard(
                                 layout = standardKeyboard,
                                 modifier = Modifier.fillMaxWidth().weight(3f),
@@ -158,7 +171,10 @@ class MainActivity : ComponentActivity()
 }
 
 @Composable
-fun Screen(modifier : Modifier = Modifier, formula : String)
+fun Screen(modifier : Modifier = Modifier,
+           formula : String,
+           result : String
+)
 {
     val density = LocalDensity.current
 
@@ -179,8 +195,8 @@ fun Screen(modifier : Modifier = Modifier, formula : String)
             val dynamicLineHeight = (dynamicFontSize * 0.9f).sp
 
             Text(
-                text=formula,
-                color=contentColorFor(MaterialTheme.colorScheme.onBackground),
+                text= formula,
+                color= MaterialTheme.colorScheme.onBackground,
                 fontSize = dynamicFontSize.sp,
                 lineHeight = dynamicLineHeight,
                 textAlign = TextAlign.End,
@@ -203,9 +219,17 @@ fun Screen(modifier : Modifier = Modifier, formula : String)
         {
             val dynamicFontSize = (minOf(maxHeight.value * 0.5f, 36f)).sp
 
+            val displayResult = if (result == "ERROR") {
+                stringResource(R.string.calculation_error)
+            }
+            else
+            {
+                result
+            }
+
             Text(
-                text="0",
-                color=contentColorFor(MaterialTheme.colorScheme.onBackground),
+                text= displayResult,
+                color= MaterialTheme.colorScheme.onBackground,
                 fontSize = dynamicFontSize,
                 textAlign = TextAlign.End
             )
